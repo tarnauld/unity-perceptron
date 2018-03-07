@@ -3,15 +3,48 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 
 public class LinearClassification : MonoBehaviour {
-	[DllImport("linear_learning")]
-	private static extern float[] linear_classification(float step, float[] p, int nb);
 
-	[SerializeField] private GameObject sphere1, sphere2, sphere3;
+    [DllImport("linear_learning")]
+    private static extern System.IntPtr generate_weight();
+
+    [DllImport("linear_learning")]
+    private static extern System.IntPtr weights_training(System.IntPtr ptr, double[] data_set);
+
+    [DllImport("linear_learning")]
+    private static extern double classify(double   [] row, double[] ptr);
+
+    [SerializeField] private GameObject sphere1, sphere2, sphere3;
+
+    [SerializeField] private GameObject[] gameObject;
 
 	// Use this for initialization
 	void Start ()
 	{
-		List<float> list = new List<float>();
+        Debug.Log(classify( new[] {1.0d, 1.0d }, new[] { 1.0d, 1.0d, 1.0d }));
+        Debug.Log(classify(new[] { -1.0d, -1.0d }, new[] { 1.0d, 1.0d, 1.0d }));
+        Debug.Log(classify(new[] { 1.0d, -1.0d }, new[] { 1.0d, 1.0d, 1.0d }));
+
+        Debug.Log(classify(new[] { 1.0d, 1.001d }, new[] { 0.0d, -1.0d, 1.0d }));
+        Debug.Log(classify(new[] { 1.0d, 0.999d }, new[] { 0.0d, -1.0d, 1.0d }));
+        Debug.Log(classify(new[] { 0.0d, -1.0d }, new[] { 0.0d, -1.0d, 1.0d }));
+
+        Debug.Log(classify(new[] { 1.0d, 1.0d }, new[] { -0.5d, 1.0d, 0.0d }));
+        Debug.Log(classify(new[] { -1.0d, -1.0d }, new[] { -0.5d, 1.0d, 0.0d }));
+        Debug.Log(classify(new[] { -1.0d, 1.0d }, new[] { -0.5d, 1.0d, 0.0d }));
+
+
+        System.IntPtr ptr = generate_weight();
+        var tmp = new double[3];
+        Marshal.Copy(ptr, tmp, 0, 3);
+        List<double> l2 = new List<double>();
+
+        foreach(var t in tmp)
+        {
+            Debug.Log(t);
+        }
+
+        
+		List<double> list = new List<double>();
 		list.Add(sphere1.transform.localPosition.x);
 		list.Add(sphere1.transform.localPosition.y);
 		list.Add(sphere1.transform.localPosition.z);
@@ -21,8 +54,27 @@ public class LinearClassification : MonoBehaviour {
 		list.Add(sphere3.transform.localPosition.x);
 		list.Add(sphere3.transform.localPosition.y);
 		list.Add(sphere3.transform.localPosition.z);
-		//float[] res = linear_classification(0.1f, list.ToArray(), 5);
-		//Debug.Log(res[0] + ": " + res[1] + ": " + res[2]);
+        
+        //System.IntPtr ptr = generate_weight();
+        ptr = weights_training(ptr, list.ToArray());
+        
+        for (var i = 0; i < gameObject.Length; i++)
+        {
+            //var tmp = new double[3];
+            Marshal.Copy(ptr, tmp, 0, 3);
+            List<double> l = new List<double>();
+            l.Add(gameObject[i].transform.localPosition.x);
+            l.Add(gameObject[i].transform.localPosition.z);
+            if (classify(l.ToArray(), tmp) > 0)
+            {
+                gameObject[i].transform.position += Vector3.up;
+            }
+            else
+            {
+                gameObject[i].transform.position += Vector3.down;
+            }
+        }
+        
 	}
 	
 	// Update is called once per frame
