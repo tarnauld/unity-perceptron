@@ -4,16 +4,17 @@ using System.Runtime.InteropServices;
 
 public class LinearClassification : MonoBehaviour {
 
-    [DllImport("linear_learning")]
+    [DllImport("machine_learning")]
     private static extern System.IntPtr generate_weight();
 
-    [DllImport("linear_learning")]
-    private static extern System.IntPtr weights_training(System.IntPtr ptr, double[] data_set);
+    [DllImport("machine_learning")]
+    private static extern System.IntPtr weights_training(System.IntPtr ptr, double[] data_set, long nb_points);
 
-    [DllImport("linear_learning")]
+    [DllImport("machine_learning")]
     private static extern double classify(double   [] row, double[] ptr);
 
-    [SerializeField] private GameObject sphere1, sphere2, sphere3;
+    [SerializeField]
+    private GameObject[] spheres;
 
     [SerializeField] private GameObject[] gameObject;
 
@@ -43,20 +44,18 @@ public class LinearClassification : MonoBehaviour {
             Debug.Log(t);
         }
 
-        
-		List<double> list = new List<double>();
-		list.Add(sphere1.transform.localPosition.x);
-		list.Add(sphere1.transform.localPosition.y);
-		list.Add(sphere1.transform.localPosition.z);
-		list.Add(sphere2.transform.localPosition.x);
-		list.Add(sphere2.transform.localPosition.y);
-		list.Add(sphere2.transform.localPosition.z);
-		list.Add(sphere3.transform.localPosition.x);
-		list.Add(sphere3.transform.localPosition.y);
-		list.Add(sphere3.transform.localPosition.z);
+
+        List<double> list = new List<double>();
+
+        foreach (var sphere in spheres)
+        {
+            list.Add(sphere.transform.localPosition.x);
+            list.Add(sphere.transform.localPosition.y);
+            list.Add(sphere.transform.localPosition.z);
+        }
         
         //System.IntPtr ptr = generate_weight();
-        ptr = weights_training(ptr, list.ToArray());
+        ptr = weights_training(ptr, list.ToArray(), list.ToArray().Length);
         
         for (var i = 0; i < gameObject.Length; i++)
         {
