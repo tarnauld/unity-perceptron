@@ -37,9 +37,9 @@ public class LinearClassification : MonoBehaviour {
 
         foreach (var sphere in spheres)
         {
-            list.Add(sphere.transform.localPosition.x);
-            list.Add(sphere.transform.localPosition.y);
-            list.Add(sphere.transform.localPosition.z);
+            list.Add(sphere.transform.position.x);
+            list.Add(sphere.transform.position.y > 0 ? 1.0 : -1.0);
+            list.Add(sphere.transform.position.z);
         }
         
         //System.IntPtr ptr = generate_weight();
@@ -50,8 +50,9 @@ public class LinearClassification : MonoBehaviour {
             //var tmp = new double[3];
             Marshal.Copy(ptr, tmp, 0, 3);
             List<double> l = new List<double>();
-            l.Add((double)gameObject[i].transform.localPosition.x);
-            l.Add((double)gameObject[i].transform.localPosition.z);
+            l.Add((double)gameObject[i].transform.position.x);
+            l.Add((double)gameObject[i].transform.position.z);
+            Debug.Log(classify(l.ToArray(), ptr));
             if (classify(l.ToArray(), ptr) > 0)
             {
                 gameObject[i].transform.position += Vector3.up;
