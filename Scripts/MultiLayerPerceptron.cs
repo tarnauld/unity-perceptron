@@ -15,12 +15,12 @@ public class MultiLayerPerceptron : MonoBehaviour {
 	[SerializeField]
 	private GameObject[] spheres;
 
-	//[SerializeField] private GameObject[] gameObjects;
+	[SerializeField] private GameObject[] gameObjects;
 	
 	
 	void Start ()
 	{
-		var d = new List<int> {2, 3, 1};
+		var d = new List<int> {2, 3, 3, 3, 1};
 
 		var ptr = create_model(d.ToArray(), d.Count);
 
@@ -32,20 +32,14 @@ public class MultiLayerPerceptron : MonoBehaviour {
 			list.Add(sphere.transform.position.z);
 		}
 
-		train_weights(ptr, 12, list.ToArray(), list.Count);
-		
-		foreach (var sphere in spheres)
-		{
-			var tmp = new List<double> {sphere.transform.localPosition.x, sphere.transform.localPosition.z};
-			Debug.Log("x: " + sphere.transform.localPosition.x + "-> z: " + sphere.transform.localPosition.z + " -> y: " + (float)classification(ptr, tmp.ToArray()));
-		}
+		train_weights(ptr, 10000, list.ToArray(), list.Count);
 
-		/*foreach (var go in gameObjects)
+		foreach (var go in gameObjects)
 		{
 			var tmp = new List<double> {go.transform.localPosition.x, go.transform.localPosition.z};
 			Debug.Log("x: " + go.transform.localPosition.x + "-> z: " + go.transform.localPosition.z + " -> y: " + (float)classification(ptr, tmp.ToArray()));
 			go.transform.position += Vector3.up * (float)classification(ptr, tmp.ToArray());
-		}*/
+		}
 		
 		Marshal.FreeHGlobal(ptr);
 	}
