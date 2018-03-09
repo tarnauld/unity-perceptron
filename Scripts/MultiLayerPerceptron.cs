@@ -27,16 +27,16 @@ public class MultiLayerPerceptron : MonoBehaviour {
 		var list = new List<double>();
 
 		foreach (var sphere in spheres){
-			list.Add(sphere.transform.position.x);
-			list.Add(sphere.transform.position.y);
-			list.Add(sphere.transform.position.z);
+			list.Add(sphere.transform.position.x / 10.0);
+			list.Add(sphere.transform.position.y / 2.0);
+			list.Add(sphere.transform.position.z / 5.0);
 		}
 
 		train_weights(ptr, 10000, list.ToArray(), list.Count);
 
 		foreach (var go in gameObjects)
 		{
-			var tmp = new List<double> {go.transform.localPosition.x, go.transform.localPosition.z};
+			var tmp = new List<double> {go.transform.localPosition.x / 10.0, go.transform.localPosition.z / 5.0};
 			Debug.Log("x: " + go.transform.localPosition.x + "-> z: " + go.transform.localPosition.z + " -> y: " + (float)classification(ptr, tmp.ToArray()));
 			go.transform.position += Vector3.up * (float)classification(ptr, tmp.ToArray());
 		}
